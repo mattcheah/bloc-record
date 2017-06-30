@@ -47,12 +47,12 @@ Answer all of these questions. Write at least one paragraph per question. Send y
 
  - Add a select method which takes an attribute and value and searches for all records that match...Your code should use a SELECT…WHERE SQL query and return an array of objects to the caller. Send your code to your mentor.
 
-# PLEASE CHECK THIS FOR ME. 
+# PLEASE CHECK THIS FOR ME. Not sure what `row` will look like after the query is executed so i'm not sure what `data` ends up looking like. 
 
     def find_by(attribute, value)
         row = connection.execute(<<-SQL)
             SELECT * FROM #{table}
-            WHERE #{attribute} = #{value};
+            WHERE #{attribute} = #{BlocRecord::Utility.sql_strings(value)};
         SQL
         
         data = Hash[columns.zip(row)]
