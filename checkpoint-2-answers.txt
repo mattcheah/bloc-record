@@ -1,0 +1,60 @@
+Answer all of these questions. Write at least one paragraph per question. Send your answers to your mentor for review.
+
+ - What's a RubyGem and why would you use one?
+ 
+ A RubyGem is a plugin of sorts that provides needed functionality to your ruby project so you don't have to rewrite modules or methods yourself and don't have to spend time re-inventing the wheel. 
+ If the task that you need to accomplish is fairly commonplace and others have required the same code multiple times, it would make more sense to install a gem to do the work for you, unless your specific situation requires a tailor-made solution that would be more efficient or offer additional functionality.   
+
+
+ - What's the difference between lazy and eager loading?
+ 
+ When a process is run when needed, it is categorized as lazy loading, compared to a process that runs immediately, which is eager loading. A process should utilize lazy loading when it is not certain if a user (or another process) will make use of that process. It should utilize eager loading if it is known that the process will definitely be used. 
+
+
+ - What's the difference between the CREATE TABLE and INSERT INTO SQL statements?
+ 
+ CREATE TABLE actually magics a new table into existence, whereas INSERT INTO creates new rows of data inside that already existing table.
+ 
+ 
+ - What's the difference between extend and include? When would you use one or the other?
+ 
+ Including a module allows the class to access the module's methods as instance methods. Extending a module allows the class to access the module's methods as class methods. If a method within a module needed to be called on a specific instance of a class, then the module should be included. Otherwise it should be extended.
+ 
+ 
+ - In persistence.rb, why do the save methods need to be instance (vs. class) methods?
+ 
+ Save methods are called on specific instances of the classes, because the save method is taking the changes made to the attributes of an instance and persisting them to the database. If persistence.rb was extended instead of included, save! would be called on the base class itself, which would not make sense given that the changes to be saved are made on specific instances.
+ 
+
+ - Given the Jar-Jar Binks example earlier, what is the final SQL query in persistence.rb's save! method?
+
+ UPDATE character
+ SET character_name = "Jar-Jar Binks", star_rating = 1
+ WHERE id = 1
+
+
+ - AddressBook's entries instance variable no longer returns anything. We'll fix this in a later checkpoint. What changes will we need to make?
+ 
+ We will either need to add back the initialize method and execute a SELECT statement to store the database entries in @entries, or we will need to define a method to retrieve entries with arguments that can help us to narrow down the list records we retrieve.
+
+ 
+ - Write a Ruby method that converts snake_case to CamelCase using regular expressions (you can test them on Rubular). Send your code to your mentor.
+
+    def convert(my_string) 
+        my_string.gsub!(/_./) {|x| x[1].upcase }
+    end
+
+
+ - Add a select method which takes an attribute and value and searches for all records that match...Your code should use a SELECT…WHERE SQL query and return an array of objects to the caller. Send your code to your mentor.
+
+# PLEASE CHECK THIS FOR ME. 
+
+    def find_by(attribute, value)
+        row = connection.execute(<<-SQL)
+            SELECT * FROM #{table}
+            WHERE #{attribute} = #{value};
+        SQL
+        
+        data = Hash[columns.zip(row)]
+        new(data)
+    end

@@ -14,7 +14,7 @@ module BlocRecord
             case value
             when String
                 "'#{value}'"
-            when Numberic
+            when Numeric
                 value.to_s
             else
                 "null"
@@ -22,7 +22,7 @@ module BlocRecord
         end
         
         def convert_keys(options)
-            options.kets.each { |k| options[k.to_s] = options.delete(k) if k.kind_of?(Symbol)}
+            options.keys.each { |k| options[k.to_s] = options.delete(k) if k.kind_of?(Symbol)}
             options
         end
         
