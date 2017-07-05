@@ -48,6 +48,39 @@ module Selection
         end
     end
     
+    def find_each(start=0, batch_size=nil)
+        if start == 0 && batch_size == nil
+            rows = all
+        else
+            rows = connection.execute <<-SQL
+                SELECT #{columns.join ","} FROM #{table}
+                #{start > 0 ? "WHERE id >= #{start} " : ""}
+                #{batch_size != nil ? "LIMIT #{batch_size}" : ""}
+            SQL
+        
+        end
+        
+        rows_to_array(rows).each do |row|
+            yield(row)
+        end
+        
+    end
+    
+    def find_in_batches(start=0, batch_size=nil)
+        if start == 0 && batch_size == nil
+            rows = all
+        else
+            rows = connection.execute <<-SQL
+                SELECT #{columns.join ","} FROM #{table}
+                #{start > 0 ? "WHERE id >= #{start} " : ""}
+                #{batch_size != nil ? "LIMIT #{batch_size}" : ""}
+            SQL
+        
+        end
+        yield(rows, batch_size)
+    
+    end
+    
     def take(num=1)
         if num >= 1 && num.is_a?(Integer)
             if num == 1 
@@ -62,7 +95,7 @@ module Selection
                 rows_to_array(rows)
             end
         else 
-            puts "Error: Number of records to retrieve must be a positive integer. (You gave: #{num}"
+            puts "Error: Number of records to retrieve must be a positive integer. (You gave: #{num})"
         end
     end
     
