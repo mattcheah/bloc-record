@@ -1,19 +1,43 @@
- def find(*ids)
-    if ids.all? { |i| i.is_a?(Integer) && i > 0}
-        if ids.length == 1
-            find_one(ids.first)
-        else
-            puts ids.join(",")
-        end
-    else
-        puts "Error: All arguments must be positive integers."
+require 'sqlite3'
+
+module Connection
+    def connection
+        @connection ||= SQLite3::Database.new(BlocRecord.database_filename)
     end
 end
 
-puts "finding: (1,2,3,4,5)"
-find(1,2,3,4,5)
-puts "finding: (1,2,'red','soap')"
-find(1,2,'red', 'soap')
-puts "finding: (1,2,{name: 'matt'})"
-find(1,2,{name: 'matt'})
-find(-2, 5, 1, 0)
+module Schema
+
+    def table
+        BlocRecord::Utility.underscore(name)
+    end
+    
+    def schema
+        unless @schema
+            @schema = {}
+            connection.table_info(table) do |col|
+                @schema[col["name"]] = col["type"]
+            end
+        end
+        @schema
+    end
+    
+    def columns
+        schema.keys
+    end
+    
+    def attributes
+        columns - ["id"]
+    end
+    
+    def count
+        connection.execute(<<-SQL)[0][0]
+            SELECT COUNT(*) FROM #{table}
+        SQL
+    end
+    
+    puts "putting schema.columns"
+    puts schema
+
+end
+
