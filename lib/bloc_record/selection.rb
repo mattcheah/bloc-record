@@ -36,7 +36,7 @@ module Selection
     def find_by(attribute, value)
         if columns.include?(attribute)
         
-            row = connection.execute(<<-SQL)
+            row = connection.execute <<-SQL
                 SELECT #{columns.join ","} FROM #{table}
                 WHERE #{attribute} = #{BlocRecord::Utility.sql_strings(value)};
             SQL
