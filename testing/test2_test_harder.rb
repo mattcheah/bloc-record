@@ -1,9 +1,10 @@
+# TEST 2: TEST HARDER. 
+
 class Array
 
     def where(query)
         query = split_by_paren(query)
         has_paren = true
-        puts "original query: #{query.to_s}"
         while has_paren
             if query.include?("(") && query.include?(")") 
                 latest_paren = nil
@@ -27,12 +28,11 @@ class Array
             
         end
         remove_parens(query)
-        puts "final query: #{query.to_s}"
-        puts ""
-        puts ""
+        puts "query is: #{query.to_s}"
         puts "============================ Starting the hard part: ============================"
         results = filter_by_conditions(query)
-        puts "results is: #{results}"
+        puts "result is: #{results}"
+        puts ""
         results
     end
     
@@ -99,18 +99,18 @@ class Array
             self.each do |record|
                 
                 
-                puts "checking if A(#{record[a]}) is #{b} than/to #{c}"
+                # puts "checking if A(#{record[a]}) is #{b} than/to #{c}"
                 if record[a].send(b, c) || record[a].send(b, c.to_i)
-                    puts "condition is true, adding this record to list."
+                    # puts "condition is true, adding this record to list."
                     temp_results.push(record)
                 end
             end
         when "AND"
             puts "this is an AND. array:"+temp_results.to_s
             temp_results.each do |record|
-                puts "checking if #{record[a]} is #{b} than/to #{c}"
+                # puts "checking if #{record[a]} is #{b} than/to #{c}"
                 unless record[a].send(b, c) || record[a].send(b, c.to_i)
-                    puts "condition is not true! removing this record from the list. "
+                    # puts "condition is not true! removing this record from the list. "
                     temp_results.delete(record)
                 end
             end
@@ -118,13 +118,13 @@ class Array
             puts "this is a NOT. array:"+temp_results.to_s
             i = 0
             (temp_results.length-1).times do
-                puts "checking if #{temp_results[i][a]} is #{b} than/to #{c}"
+                # puts "checking if #{temp_results[i][a]} is #{b} than/to #{c}"
                 if temp_results[i][a].send(b, c) || temp_results[i][a].send(b, c.to_i)
-                    puts "condition is true! deleting this record from the list"
+                    # puts "condition is true! deleting this record from the list"
                     temp_results.delete_at(i)
                     i-=1
                 end
-                puts "done checking record, temp+results is now: #{temp_results}"
+                # puts "done checking record, temp+results is now: #{temp_results}"
                 i += 1
             end
         end
@@ -145,10 +145,10 @@ class Array
                 remove_parens(x)
             else
                 arr[i] = x.split(/(=|IS|OR|AND|NOT|>=|<=|<|>)/)
-                puts "x is : #{arr[i]}"
+                # puts "x is : #{arr[i]}"
             end
         end
-        puts arr.to_s
+        # puts arr.to_s
     end
 end
 
@@ -179,34 +179,31 @@ hash5["age"] = 120
 
 my_array = [hash1, hash2, hash3, hash4, hash5]
 
-my_array.where("age > 10")
+# my_array.where("age > 10")
 # #expecting 1, 2, 4, 5
 
-my_array.where("id = 3")
+# my_array.where("id = 3")
 # #expecting 3
 
-my_array.where("id = 2 OR age > 50")
+# my_array.where("id = 2 OR age > 50")
 # expecting 2, 4, 5
 
-my_array.where("name = Bob AND age <= 37")
+# my_array.where("name = Bob AND age <= 37")
 # expecting 1
 
-my_array.where ("age > 15 NOT name = Bob")
+# my_array.where ("age > 15 NOT name = Bob")
 # expecting 5
 
-my_array.where("name = Bob").where("id = 4")
+# my_array.where("name = Bob").where("id = 4")
 # expecting 4
 
-my_array.where("age > 40 OR (name = Bob AND id = 1)")
-# expecting: 1, 4, and 5. This does not work. 
+ my_array.where("age > 40 OR (name = Bob AND id = 1)")
+# expecting: 1, 4, and 5
 
-# TEST 2: TEST HARDER. 
 
-# Layout for what to do to make this actually happen.
 
-# 1. Regex the query statement to put every comparison statement into an array of length 3 (eg. ["name", "=", "bob"]), keeping them separate from operators like NOT/AND/OR, and keeping parenthetical order by nesting comparison statements in arrays
-# 2. Execute each of these statements from self - filtering the original array down to match each condition. Store this result array in a hash in place of the condition array.
-# 3. When this is finished, you will have an array of hashes separated by AND/OR/NOTs, parentheses will be represented as arrays.
-# 4. Iterate through array, checking the deepest nesting level and resolving the deepest statements first.
-# 5. After all arrays have been evaluated against each other using the AND/OR/NOT, your resulting array will contain the answers. 
-# 6. Drink a high ABV beer. 
+# break_up("1 = 1 OR (1 = 2 AND 1=3 OR 5 = 5) AND ((12 = 12 OR 1 = 2) OR (5 = 9 AND 1 = 0))")
+# => ["WHERE 1 = 1 OR ", "(", "1 = 2 AND 1=3 OR 5 = 5", ")", " AND ", "(", "", "(", "12 = 12 OR 1 = 2", ")", " OR ", "(", "5 = 9 AND 1 = 0", ")", "", ")"]
+
+
+#break_up("(1)(2)(3)((4)(5))")
