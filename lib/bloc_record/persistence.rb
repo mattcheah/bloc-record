@@ -44,7 +44,7 @@ module Persistence
             attribute = m[7..m.length-1]
             update_attribute(attribute, args[0])
         else
-            puts "There's no method called #{m} here -- please try again."  
+            super
         end
     
     end
@@ -55,7 +55,6 @@ module Persistence
             attrs = BlocRecord::Utility.convert_keys(attrs)
             attrs.delete "id"
             vals = attributes.map { |key| BlocRecord::Utility.sql_strings(attrs[key]) }
-            
             connection.execute <<-SQL
                 INSERT INTO #{table} (#{attributes.join ","})
                 VALUES (#{vals.join ","});

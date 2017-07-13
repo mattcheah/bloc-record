@@ -137,16 +137,6 @@ module Selection
         rows_to_array(rows)
     end
     
-    def method_missing(m, *args, &block)
-    
-        if m[0..7] == "find_by_"
-            find_attribute = m[8..m.length-1]
-            find_by(find_attribute, args[0])
-        else
-            puts "There's no method called #{m} here -- please try again."  
-        end
-    
-    end
     
     def where(*args)
         if args.count > 1
@@ -239,6 +229,17 @@ module Selection
         # JOIN professor ON department.id = professor.department_id
         # JOIN compensation ON professor.id = compensation.professor_id
         # GROUP BY department_name;
+    end
+    
+    def method_missing(m, *args, &block)
+    
+        if m[0..7] == "find_by_"
+            find_attribute = m[8..m.length-1]
+            find_by(find_attribute, args[0])
+        else
+            puts "There's no method called #{m} here -- please try again."  
+        end
+    
     end
     
     private
