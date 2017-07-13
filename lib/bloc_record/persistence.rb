@@ -34,6 +34,21 @@ module Persistence
         self.update(self.id, {attribute => value})
     end
     
+    def update_attributes(updates)
+        self.class.update(self.id, updates)
+    end
+    
+    def method_missing(m, *args, &block)
+    
+        if m[0..6] == "update_"
+            attribute = m[7..m.length-1]
+            update_attribute(attribute, args[0])
+        else
+            puts "There's no method called #{m} here -- please try again."  
+        end
+    
+    end
+    
     module ClassMethods
         
         def create(attrs)
@@ -52,19 +67,43 @@ module Persistence
             
         end
         
-        def update(id, updates)
-            updates = BlocRecord::Utility.convert_keys(updates)
-            updates.delete "id"
+        def update(ids, updates)
+            case updates
+            when Hash
+                ids.each_with_index do |x, i|
+                    updates_hash = updates[i]
+                    updates_array = updates_hash.map { |key, value| "#{key} = #{BlocRecord::Utility.sql_strings(value)}" } 
+
+                    connection.execute <<-SQL
+                        UPDATE #{table}
+                        SET #{updates_array.join(",")}
+                        WHERE id = #{x};
+                    SQL
+                    
+                end
+           
+            when Array
             
-            updates_array = updates.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }
-            where_clause = id.nil? ? ";" : "WHERE id = #{id};"
-            connection.execute <<-SQL
-                UPDATE #{table}
-                SET #{updates_array * ","}
-                #{where_clause};
-            SQL
-            # is the * a join?
-            
+                updates = BlocRecord::Utility.convert_keys(updates)
+                updates.delete "id"
+                
+                updates_array = updates.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }
+                
+                if ids.class == Fixnum
+                    where_clause = "WHERE id = #{ids};"
+                elsif ids.class == Array
+                    where_clause = ids.empty? ? ";" : "WHERE id IN (#{ids.join(',')});"
+                else
+                    where_clause = ""
+                end
+                
+                connection.execute <<-SQL
+                    UPDATE #{table}
+                    SET #{updates_array * ","}
+                    #{where_clause};
+                SQL
+                # is the * a join?
+            end
             true
         end
         

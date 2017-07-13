@@ -252,76 +252,13 @@ module Selection
     end
     
     def rows_to_array(rows)
-        rows.map {|row| new(Hash[columns.zip(row)]) }
+        collection = BlocRecord::Collection.new
+        rows.each { |row| collection << new(Hash[columns.zip(row)]) }
+        collection
     end
     
     #Lets see how this works: 
     # columns is schema.keys: [id, deparment_name, professor_name]
     #
     
-end
-
-class Array
-    
-    def where(condition)
-        case condition
-        when String
-            condition = condition.split(/(=|IS|OR|AND|NOT|>=|<=|<|>)/)
-        end
-
-        result_array = []
-        directive = nil
-        condition.each_slice(4) do |a, b, c, d|
-            
-            case directive
-            when nil
-                self.each do |record|
-                    if record[a].send(b, c)
-                        result_array.push(record)
-                    end
-                end
-            when "AND"
-                result_array.each do |record|
-                    unless record[a].send(b, c)
-                        result_array.delete(record)
-                    end
-                end
-            when "OR"
-                self.each do |record|
-                    if record[a].send(b, c) && self.include?(record)==false
-                        result_array.push(record)
-                    end
-                end
-            when "NOT"
-                result_array.each do |record|
-                    if record[a].send(b, c)
-                        result_array.delete(record)
-                    end
-                end
-            end
-            
-
-            
-            directive = d
-            
-            # case directive
-            # when nil
-                
-            # when "AND"
-                
-            # when "OR"
-    
-            # when "NOT"
-                
-            # end
-            
-            # AND WHAT ABOUT PARENTHESES AND ORDER OF OPERATIONS? LIFE IS SO HARD. 
-            
-        end
-        
-        result_array
-        
-    end
-    
-
 end
