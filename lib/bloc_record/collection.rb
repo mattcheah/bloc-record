@@ -35,5 +35,11 @@ module BlocRecord
             
             self.any? ? self.first.class.update(ids, updates) : false
         end
+        
+        def destroy_all()
+            self.each do |x|
+                x.delete()
+            end
+        end
     end
 end

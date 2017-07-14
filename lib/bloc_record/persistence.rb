@@ -38,6 +38,10 @@ module Persistence
         self.class.update(self.id, updates)
     end
     
+    def delete()
+        self.class.destroy(self.id)
+    end
+    
     def method_missing(m, *args, &block)
     
         if m[0..6] == "update_"
@@ -109,5 +113,50 @@ module Persistence
         def update_all(updates)
             update(nil, updates)
         end
+        
+        def destroy(*id)
+            if id.length > 1
+                where_clause = "WHERE id IN (#{id.join('m')});"
+            else
+                where_clause = "WHERE id = #{id.first};" 
+            end
+            
+            connection.execute <<-SQL
+                DELETE FROM #{table} #{where_clause}
+            SQL
+            
+            true
+        end
+        
+        def destroy_all(*args)
+            
+            unless args && !args.first.empty?
+                connection.execute("DELETE FROM #{table}")
+                return true
+            end
+            
+            if args.length == 1
+            
+                case args.first
+                when Hash
+                    conditions_hash = BlocRecord::Utility.convert_keys(args.first)
+                    conditions = conditions_hash.map {|key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
+                when String
+                    conditions = args.first
+                end
+            else
+                conditions = args.shift
+                conditions.gsub!(/\?/) { |m| args.shift }
+                conditions
+            end
+            
+            connection.execute <<-SQL
+                DELETE FROM #{table}
+                WHERE #{conditions};
+            SQL
+            
+            true
+        end
+        
     end
 end
