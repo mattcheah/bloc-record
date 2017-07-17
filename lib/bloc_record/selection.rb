@@ -1,3 +1,5 @@
+
+require 'pg'
 require 'sqlite3'
 
 module Selection

@@ -1,5 +1,10 @@
-require 'sqlite3'
 require 'bloc_record/utility'
+require 'bloc_record/connection'
+
+require 'pg'
+require 'sqlite3'
+
+
 
 module Schema
 
@@ -10,8 +15,22 @@ module Schema
     def schema
         unless @schema
             @schema = {}
-            connection.table_info(table) do |col|
-                @schema[col["name"]] = col["type"]
+            puts "connection is #{connection.to_s}"
+            
+            if BlocRecord::database_type == :pg
+                table_info = connection.exec <<-SQL
+                    select column_name, data_type
+                    from INFORMATION_SCHEMA.COLUMNS where table_name = '#{table}';
+                SQL
+                puts table_info.to_s
+                
+                
+            elsif BlocRecord::database_type == :sqlite3
+
+                connection.table_info(table) do |col|
+                    @schema[col["name"]] = col["type"]
+                end
+                
             end
         end
         @schema
