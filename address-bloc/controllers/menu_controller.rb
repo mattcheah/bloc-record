@@ -96,7 +96,7 @@ class MenuController
   def search_entries
     print "Search by name: "
     name = gets.chomp
-    match = @address_book.find_by(:name, name)
+    match = @address_book.find_entry(name)
     system "clear"
     if match
       puts match.to_s
@@ -175,6 +175,7 @@ class MenuController
     entry.update_attributes(updates)
     system "clear"
     puts "Updated entry:"
+
     puts Entry.find(entry.id)
   end
 
